@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Saturn Rock Paper Scissors Game</title>
+  <!-- Tailwind CSS via CDN (for demo purposes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Animate.css via CDN (for demo purposes, will not conflict) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="globals.css">
+</head>
+<body class="galaxy-bg min-h-screen flex flex-col items-center justify-center relative">
+
+  <header class="mb-8 flex flex-col items-center">
+    <h1 class="text-5xl font-extrabold animate-glow-pulse" style="color: var(--primary)">Saturn Rock Paper Scissors</h1>
+    <p class="mt-2 text-xl text-muted-foreground" style="color: var(--muted-foreground)">Play a cosmic round. May Saturn's rings grant you victory!</p>
+  </header>
+
+  <main class="w-full max-w-md">
+    <div class="bg-card text-card-foreground rounded-xl shadow-lg p-8 flex flex-col items-center animate-float relative">
+      <div class="relative mb-6">
+        <!-- Saturn SVG with animated ring -->
+        <svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="60" cy="45" rx="32" ry="32" fill="oklch(0.9 0.15 85)" style="filter: drop-shadow(0 0 12px oklch(0.9 0.15 85 / 0.5))"/>
+          <ellipse class="animate-ring-rotate" cx="60" cy="48" rx="45" ry="12" fill="none" stroke="oklch(0.6 0.2 300)" stroke-width="5" opacity="0.6"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold mb-3" style="color: var(--primary)">Choose your weapon</h2>
+      <div id="choices" class="flex gap-6 mb-6">
+        <button class="choice px-6 py-3 rounded-lg font-semibold bg-primary text-primary-foreground shadow transition hover:scale-105" data-choice="rock">🪨 Rock</button>
+        <button class="choice px-6 py-3 rounded-lg font-semibold bg-primary text-primary-foreground shadow transition hover:scale-105" data-choice="paper">📄 Paper</button>
+        <button class="choice px-6 py-3 rounded-lg font-semibold bg-primary text-primary-foreground shadow transition hover:scale-105" data-choice="scissors">✂️ Scissors</button>
+      </div>
+      <div id="result" class="text-lg font-bold mt-4 mb-2 min-h-[2em]" style="color: var(--accent)"></div>
+      <div id="score" class="mb-2 text-sm" style="color: var(--muted-foreground)">You: <span id="userScore">0</span>&nbsp;|&nbsp;Saturn: <span id="cpuScore">0</span></div>
+      <button id="reset" class="mt-4 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground font-semibold shadow transition hover:scale-105" type="button">
+        Reset Game
+      </button>
+    </div>
+    <div class="mt-10 flex flex-col items-center gap-2">
+      <button id="toggle-dark" class="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold shadow animate-choice-select transition" type="button">
+        Toggle Dark Mode
+      </button>
+      <span class="text-muted-foreground text-xs" style="color: var(--muted-foreground)">Made with love for Saturnians 🪐</span>
+    </div>
+  </main>
+
+  <script>
+    // Theme toggler
+    const btn = document.getElementById('toggle-dark');
+    const html = document.documentElement;
+    btn.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      btn.textContent = html.classList.contains('dark') ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+    });
+    btn.textContent = html.classList.contains('dark') ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+
+    // Rock Paper Scissors Game
+    const choices = document.querySelectorAll('.choice');
+    const resultDiv = document.getElementById('result');
+    const userScoreSpan = document.getElementById('userScore');
+    const cpuScoreSpan = document.getElementById('cpuScore');
+    const resetBtn = document.getElementById('reset');
+    let userScore = 0, cpuScore = 0;
+
+    const weapons = ['rock', 'paper', 'scissors'];
+    const winMatrix = {
+      rock: 'scissors',
+      paper: 'rock',
+      scissors: 'paper'
+    };
+
+    function cpuPlay() {
+      return weapons[Math.floor(Math.random() * 3)];
+    }
+
+    function playRound(userChoice) {
+      const cpuChoice = cpuPlay();
+      let resultText = `You chose <b>${emoji(userChoice)}</b>, Saturn chose <b>${emoji(cpuChoice)}</b>. `;
+      if (userChoice === cpuChoice) {
+        resultText += "<span style='color:var(--primary)'>It's a cosmic tie!</span>";
+      } else if (winMatrix[userChoice] === cpuChoice) {
+        userScore++;
+        resultText += "<span style='color:var(--primary)'>You win this round!</span>";
+      } else {
+        cpuScore++;
+        resultText += "<span style='color:var(--accent)'>Saturn wins this round!</span>";
+      }
+      userScoreSpan.textContent = userScore;
+      cpuScoreSpan.textContent = cpuScore;
+      resultDiv.innerHTML = resultText;
+      resultDiv.classList.add('animate-choice-select');
+      setTimeout(() => resultDiv.classList.remove('animate-choice-select'), 400);
+    }
+
+    function emoji(choice) {
+      switch(choice) {
+        case 'rock': return '🪨 Rock';
+        case 'paper': return '📄 Paper';
+        case 'scissors': return '✂️ Scissors';
+      }
+    }
+
+    choices.forEach(btn => btn.addEventListener('click', e => playRound(e.target.dataset.choice)));
+
+    resetBtn.addEventListener('click', () => {
+      userScore = 0;
+      cpuScore = 0;
+      userScoreSpan.textContent = userScore;
+      cpuScoreSpan.textContent = cpuScore;
+      resultDiv.innerHTML = '';
+    });
+  </script>
+</body>
+</html>
